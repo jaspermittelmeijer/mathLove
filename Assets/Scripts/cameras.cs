@@ -9,7 +9,7 @@ public class FollowCam : MonoBehaviour
 	// Class to control automatic moving cameras
 
 
-	Settings settings;
+	MLSettings settings;
 	public GameObject target, targetDebug;
 	Vector3 targetPositionSmoothed;
 	VisualLineDebug lineDebug;
@@ -20,7 +20,7 @@ public class FollowCam : MonoBehaviour
 	Vector3 xAxis, yAxis, zAxis;
 	bool following;
 	float collisionRange = 5f;
-	World world;
+	MLEngine world;
 	bool hasLock = false;
 	GameObject cSelf;
  
@@ -34,8 +34,8 @@ public class FollowCam : MonoBehaviour
 
 	public void setTarget (GameObject _target)
 	{
-		settings = GameObject.Find ("Root").GetComponent <Settings> ();
-		world = GameObject.Find ("Root").GetComponent <World> ();
+		settings = GameObject.Find ("Root").GetComponent <MLSettings> ();
+		world = GameObject.Find ("Root").GetComponent <MLEngine> ();
 		cSelf = transform.gameObject;
 
 		lineDebug = GameObject.Find ("MainVisualisationObject").GetComponent<VisualLineDebug> ();

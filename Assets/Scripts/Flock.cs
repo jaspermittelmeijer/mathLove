@@ -6,7 +6,7 @@ public class Flock : MonoBehaviour
 	// Class to hold a flock. Note that this doesn't have to be a monobehaviour the way it is now.
 
 	GameObject flockObject;
-	Settings settings;
+	MLSettings settings;
 	GameObject[] boids;
 
 
@@ -18,7 +18,7 @@ public class Flock : MonoBehaviour
 	}
 
 	public void createFlock (){
-		settings = GameObject.Find ("Root").GetComponent <Settings> (); // get a reference to the settings
+		settings = GameObject.Find ("Root").GetComponent <MLSettings> (); // get a reference to the settings
 		flockObject = transform.gameObject;
 		boids = new GameObject[settings.flockSize];
 

@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class Interaction : MonoBehaviour
+public class MLUx : MonoBehaviour
 {
 
 	// Class to handle any interaction with the user.
@@ -28,16 +28,16 @@ public class Interaction : MonoBehaviour
 
 	public Button[] bufferButtons;
 
-	World world;
-	Settings settings;
+	MLEngine engine;
+	MLSettings settings;
 
 
 	void Start ()
 	{
-		world = GameObject.Find ("Root").GetComponent <World> ();
-		settings = GameObject.Find ("Root").GetComponent <Settings> ();
+		engine = GameObject.Find ("Root").GetComponent <MLEngine> ();
+		settings = GameObject.Find ("Root").GetComponent <MLSettings> ();
 
-		theCamera = settings.MainCamera;
+		theCamera = settings.MainCamera; //
 
 		UI_VerticeSlider.GetComponent <Slider> ().value = settings.initialVerticeCount;
 		verticeSliderChanged (settings.initialVerticeCount); 
@@ -56,55 +56,99 @@ public class Interaction : MonoBehaviour
 
 	}
 
-	public void setCamera (GameObject _camera)
+	 void setCamera (GameObject _camera)
 	{
 		theCamera = _camera;
 
 	}
+
+
 	
 	// Update is called once per frame
 	void Update ()
 	{
+
+
+
+		// Check for keyboard input
+
+		if (Input.GetKeyDown ("c")) {
+			Debug.Log ("Switch Camera");
+			if (settings.thePlatform == "OSX") {
+				OVRManager.display.RecenterPose ();
+				//				OVRDisplay.RecenterPose	();
+			}
+
+			settings.currentCameraNo = (settings.currentCameraNo + 1) % engine.getCurrentIsland ().getCameraCount ();
+//
+//
+//
+//			if (settings.currentCameraNo == engine.getCurrentIsland ().getCameraCount ()) {
+//				settings.currentCameraNo = 0;
+//			}
+			engine.goTo ();
+			setCamera (engine.getCurrentCamera ());
+
+		}
+
+		if (Input.GetKeyDown ("f")) {
+			while (engine.getCurrentIsland ().getDelauney ().flipAllTriangles ())
+				;
+
+			Debug.Log ("Flipping triangles");
+		}
+		if (Input.GetKeyDown (KeyCode.Return)) {
+			engine.reSpawnCurrentIsland (settings.initialVerticeCount, settings.initialAmplitude, settings.initialRoughness);
+			Debug.Log ("Enter");
+		}
+
+		if (Input.GetKeyDown ("n")) {
+			engine.nextChapter ();
+
+		}
+		if (Input.GetKeyDown ("p")) {
+			engine.previousChapter ();
+
+		}
+
+		if (Input.GetKeyDown ("g")) {
+			engine.goTo ();
+
+		}
+
+		if (Input.GetKeyDown ("x")) {
+			engine.exit ();
+
+		}
+
+	
+
+	
+
+	
+
+//		if (settings.thePlatform == "OSX") {
+//			if (Input.GetKeyDown (KeyCode.Return)) {
+//				world.reSpawnCurrentIsland (settings.initialVerticeCount, settings.initialAmplitude, settings.initialRoughness);
+//			}
+//		}
+
+
+		// Check for cardboard input
+
 	
 		if (settings.thePlatform == "iOS") {
 			if (Cardboard.SDK.CardboardTriggered) {
 				Debug.Log ("trigger");
-				world.reSpawnCurrentIsland (settings.initialVerticeCount, settings.initialAmplitude, settings.initialRoughness);
+				engine.reSpawnCurrentIsland (settings.initialVerticeCount, settings.initialAmplitude, settings.initialRoughness);
 
 
 			}
 		}
 
-		if (settings.thePlatform == "OSX") {
-			if (Input.GetKeyDown (KeyCode.Return)) {
-				world.reSpawnCurrentIsland (settings.initialVerticeCount, settings.initialAmplitude, settings.initialRoughness);
-			}
-		}
-
-		if (Input.GetKeyDown (KeyCode.Space)) {
-//			theCamera = world.getCurrentIsland ().setCurrentCamera (settings.currentCameraNo);
-			if (settings.thePlatform == "OSX") {
-				OVRManager.display.RecenterPose ();
-
-//				OVRDisplay.RecenterPose	();
-			}
-			settings.currentCameraNo++;
-
-			if (settings.currentCameraNo == world.getCurrentIsland ().getCameraCount ()) {
-				settings.currentCameraNo = 0;
-
-			}
-
-//			if (settings.currentCameraNo == 0) {
-//				
-//				settings.currentCameraNo = 1;
-//			} else {
-//				settings.currentCameraNo = 0;
-//			}
-		
+	
 
 
-		}
 
 
 		// Call counter script for onscreen debug messages
@@ -112,30 +156,17 @@ public class Interaction : MonoBehaviour
 			debugMessage ("", -1.0f);
 		}
 
-		if (Input.GetKeyDown ("m")) {
-			while (world.getCurrentIsland ().getDelauney ().flipAllTriangles ())
-				;
-			Debug.Log ("Flipping triangles");
 
-		}
 
 
 		GameObject.Find ("Cube").transform.rotation = Input.gyro.attitude;
 
-		if (settings.directorOn) {
-			
-			
-			if (Random.value < (1f / 180f)) {
-//				world.getCurrentIsland ().setCurrentCamera (Mathf.FloorToInt(Random.Range(0f,1.99999f)));
-				theCamera = world.getCurrentIsland ().setCurrentCamera (Mathf.FloorToInt (Random.Range (0f, 1.99999f)));
 
-			}
-		} else {
-			theCamera = world.getCurrentIsland ().setCurrentCamera (settings.currentCameraNo);
-		}
 
 
 		if (settings.thePlatform != "iOS") {
+
+			setCamera (engine.getCurrentCamera ());
 
 			if (Input.GetMouseButtonDown (0)) {
 				//			Debug.Log("Start looking");
@@ -175,7 +206,7 @@ public class Interaction : MonoBehaviour
 				theCamera.transform.localRotation = originalRotation * xQuaternion * yQuaternion;
 //				theCamera.transform.localRotation = Quaternion.Euler ( theCamera.transform.eulerAngles.x,  theCamera.transform.eulerAngles.y, 0f);
 
-				theCamera.transform.eulerAngles = new Vector3(theCamera.transform.eulerAngles.x,theCamera.transform.eulerAngles.y,0f);
+				theCamera.transform.eulerAngles = new Vector3 (theCamera.transform.eulerAngles.x, theCamera.transform.eulerAngles.y, 0f);
 
 
 
@@ -190,8 +221,8 @@ public class Interaction : MonoBehaviour
 	public void bufferButtonClicked (int buffer)
 	{
 		debugMessage ("Switch to buffer: " + buffer, 3f);
-		world.switchToIsland (buffer);
-		setCamera (world.getCurrentIsland ().getCurrentCamera ());
+		engine.switchToIsland (buffer);
+		setCamera (engine.getCurrentCamera ());
 	}
 
 
@@ -223,12 +254,13 @@ public class Interaction : MonoBehaviour
 	public void deleteIslandButtonClicked ()
 	{
 
-		if (world.getNumberOfIslands () > 1) {
-			bufferButtons [world.getCurrentBufferSize () - 1].gameObject.SetActive (false);
-			world.deleteCurrentBuffer ();
+		if (engine.getNumberOfIslands () > 1) {
+			bufferButtons [engine.getCurrentBufferSize () - 1].gameObject.SetActive (false);
+			engine.deleteCurrentBuffer ();
 			debugMessage ("Deleted island", 5f);
 
-			setCamera (world.getCurrentIsland ().getCurrentCamera ());
+			setCamera (engine.getCurrentCamera ());
+//			setCamera (MLDirector?);
 		}
 
 	}
@@ -237,11 +269,11 @@ public class Interaction : MonoBehaviour
 	{
 
 
-		if (world.getNumberOfIslands () < 5) {
-			world.addNewIsland (verticeSliderValue, amplitudeSliderValue, roughnessSliderValue);
+		if (engine.getNumberOfIslands () < 5) {
+			engine.addNewIsland (verticeSliderValue, amplitudeSliderValue, roughnessSliderValue);
 			debugMessage ("Created new island", 5f);
-			bufferButtons [world.getNumberOfIslands () - 1].gameObject.SetActive (true);
-			setCamera (world.getCurrentIsland ().getCurrentCamera ());
+			bufferButtons [engine.getNumberOfIslands () - 1].gameObject.SetActive (true);
+			setCamera (engine.getCurrentCamera());
 		}
 
 

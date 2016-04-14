@@ -10,18 +10,16 @@ public class Delauney
 	// A class to hold/create a delauney triangulation
 
 	Vector3[] verticeData;
-	//	Vector2[] edgeData;
 	int[] triangleData;
-	//	Triangle[] triangles;
-	//	private Triangle triangleMethods;
-
-	//	Point[] points;
 	int triangleIndex;
 	ArrayList flipStack;
 
+	ExtendedMesh theMesh;
+	bool record;
+	public bool generatorDone;
 
-	//
-	ExtendedMesh testMesh;
+	GeometryPlayer recordingTarget;
+
 
 
 	public Delauney ()
@@ -30,10 +28,30 @@ public class Delauney
 
 	}
 
+	public void createDelauney (int numberOfVertices, float dimensions, RandomTerrain terrainWrapper, GeometryPlayer passRecordingTarget)
+	{
+		record = true;
+		recordingTarget = passRecordingTarget;
+
+		generate ( numberOfVertices,  dimensions,  terrainWrapper);
+			
+
+
+	}
+
 	public void createDelauney (int numberOfVertices, float dimensions, RandomTerrain terrainWrapper)
 	{
-//		triangleMethods = new Triangle ();
-			
+		record = false; // if no value passed for record, don't record
+		generate ( numberOfVertices,  dimensions,  terrainWrapper);
+
+	}
+
+
+
+	 void generate (int numberOfVertices, float dimensions, RandomTerrain terrainWrapper)
+	{
+		generatorDone = false;
+
 		verticeData = new Vector3[numberOfVertices + 1];
 		
 		// first 3 verices = 1 triangle. Each next vertice can generate no more than 2 additional triangles. This may be untrue
@@ -106,8 +124,18 @@ public class Delauney
 					} 
 				}
 
-				testMesh = new ExtendedMesh (getUniqueVertices (), getUniqueTriangles (), 0.5f);
-				GameObject.Find ("GeometryPlayback").GetComponent<GeometryPlayer> ().addMesh (testMesh);
+				recordState();
+
+//				yield return null;
+
+
+//				if (record) {
+//
+//					theMesh = new ExtendedMesh (getUniqueVertices (), getUniqueTriangles (), 0.5f);
+////					GameObject.Find ("GeometryPlayback").GetComponent<GeometryPlayer> ().addMesh (theMesh);
+//					recordingTarget.addMesh (theMesh);
+//
+//				}
 
 			} else {
 				// Point is not in existing mesh. Which means we'll add triangles to connect it to all the vertices it can 'see'.
@@ -129,8 +157,12 @@ public class Delauney
 					addTriangle (current, next, n, triangleIndex);
 					addToFlipStack (triangleIndex);
 
-					testMesh = new ExtendedMesh (getUniqueVertices (), getUniqueTriangles (), 0.05f);
-					GameObject.Find ("GeometryPlayback").GetComponent<GeometryPlayer> ().addMesh (testMesh);
+//					if (record) {
+//						theMesh = new ExtendedMesh (getUniqueVertices (), getUniqueTriangles (), 0.05f);
+////						GameObject.Find ("GeometryPlayback").GetComponent<GeometryPlayer> ().addMesh (theMesh);
+//						recordingTarget.addMesh (theMesh);
+//					}
+					recordState();
 
 					triangleIndex++;
 					current = next;
@@ -158,9 +190,9 @@ public class Delauney
 
 			while (flipStack.Count > 0) {
 				if (flipFlipStack ()) {
-					testMesh = new ExtendedMesh (getUniqueVertices (), getUniqueTriangles (), 0.05f);
-					GameObject.Find ("GeometryPlayback").GetComponent<GeometryPlayer> ().addMesh (testMesh);
-
+//					theMesh = new ExtendedMesh (getUniqueVertices (), getUniqueTriangles (), 0.05f);
+//					GameObject.Find ("GeometryPlayback").GetComponent<GeometryPlayer> ().addMesh (theMesh);
+					recordState();
 				}
 
 			}
@@ -169,7 +201,24 @@ public class Delauney
 
 
 		}
+
+		generatorDone = true;
+
 	}
+
+
+	void recordState () {
+		if (record) {
+			theMesh = new ExtendedMesh (getUniqueVertices (), getUniqueTriangles (), 0.05f);
+			recordingTarget.addMesh (theMesh);
+		}
+
+	}
+
+
+
+
+
 
 	Vector3[] uniqueVertices;
 	int[] uniqueTriangles;

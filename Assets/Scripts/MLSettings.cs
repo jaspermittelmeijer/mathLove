@@ -2,7 +2,11 @@
 using System.Collections;
 using UnityEngine.UI;
 
-public class Settings : MonoBehaviour
+
+
+
+
+public class MLSettings : MonoBehaviour
 {
 	// Class to hold settings. No active code should reside here.
 
@@ -22,18 +26,21 @@ public class Settings : MonoBehaviour
 //	public bool flightCamOn;
 	public int currentCameraNo = 0;
 	public bool directorOn =true;
+	public int chapter;
 
-	Interaction interaction;
+
+	MLUx interaction;
 
 	public Color lineColor01;
 
 	void Start ()
 	{
 
-		interaction = GameObject.Find ("Root").GetComponent <Interaction> ();
+		interaction = GameObject.Find ("Root").GetComponent <MLUx> ();
 
 		// Call script to apply settings that depend on platform (eg touch vs mouse)
 		applyPlatformSettings ();
+
 
 	}
 	
@@ -56,6 +63,7 @@ public class Settings : MonoBehaviour
 
 		case RuntimePlatform.OSXPlayer:
 			thePlatform = "OSX";
+		
 			break;
 
 		case RuntimePlatform.WebGLPlayer:
@@ -83,12 +91,25 @@ public class Settings : MonoBehaviour
 			break;
 			
 		case "OSX":
-			onScreenMessages = true;
-			UICanvas.SetActive (false);
-			MainCamera.SetActive (false);
-			OculusMain.SetActive (true);
+			if (!OVRManager.isHmdPresent) {
+				Debug.Log ("No headset during init");
 
-			CardboardMain.SetActive (false);
+				onScreenMessages = true;
+				UICanvas.SetActive (true);
+				MainCamera.SetActive (true);
+				OculusMain.SetActive (false);
+
+				CardboardMain.SetActive (false);
+			} else {
+
+
+				onScreenMessages = true;
+				UICanvas.SetActive (false);
+				MainCamera.SetActive (false);
+				OculusMain.SetActive (true);
+
+				CardboardMain.SetActive (false);
+			}
 			break;
 
 		case "WebGL":

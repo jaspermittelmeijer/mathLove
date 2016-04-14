@@ -1,16 +1,12 @@
 ﻿using UnityEngine;
 using System.Collections;
+using System.Linq;
 
 public class ExtendedMesh {
 
 	public Mesh theMesh;
 	float duration;
 
-//	public ExtendedMesh (Mesh passMesh, float passDuration){
-//		theMesh = passMesh;
-//		duration = passDuration;
-//
-//	}
 
 	public ExtendedMesh (UnityEngine.Vector3[] passVertices, int[] passTriangles, float passDuration){
 		
@@ -19,10 +15,34 @@ public class ExtendedMesh {
 		theMesh.triangles = passTriangles;
 		theMesh.RecalculateNormals ();
 
+		theMesh = addBackSide (theMesh);
+
 		duration = passDuration;
 
 
 	}
+
+	Mesh addBackSide (Mesh inputMesh)
+	{
+		CombineInstance[] combine = new CombineInstance[2];
+		Mesh backSideMesh = new Mesh ();
+		backSideMesh.vertices = inputMesh.vertices;
+
+		Vector3[] normals = inputMesh.normals;
+		for (int i = 0; i < normals.Length; i++)
+			normals [i] = -normals [i];
+		backSideMesh.normals = normals;
+		backSideMesh.triangles = inputMesh.triangles.Reverse ().ToArray ();
+
+		combine [0].mesh = inputMesh;
+		combine [1].mesh = backSideMesh;
+
+		Mesh combinedMesh = new Mesh ();
+		combinedMesh.CombineMeshes (combine, true, false);
+		return combinedMesh;
+	}
+
+
 
 	public Mesh getMesh () {
 		return theMesh;
