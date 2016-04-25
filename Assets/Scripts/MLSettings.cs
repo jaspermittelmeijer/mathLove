@@ -10,7 +10,7 @@ public class MLSettings : MonoBehaviour
 {
 	// Class to hold settings. No active code should reside here.
 
-	public GameObject MainCamera, CardboardMain, OculusMain, UICanvas;
+	public GameObject MainCamera, CardboardMain, OculusMain, UICanvas, Titles;
 	public bool simulate;
 	public string simulationPlatform;
 	public string thePlatform;
@@ -29,14 +29,14 @@ public class MLSettings : MonoBehaviour
 	public int chapter;
 
 
-	MLUx interaction;
+	UserInterface interaction;
 
 	public Color lineColor01;
 
 	void Start ()
 	{
 
-		interaction = GameObject.Find ("Root").GetComponent <MLUx> ();
+		interaction = GameObject.Find ("Root").GetComponent <UserInterface> ();
 
 		// Call script to apply settings that depend on platform (eg touch vs mouse)
 		applyPlatformSettings ();

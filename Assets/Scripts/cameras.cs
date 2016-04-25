@@ -20,7 +20,7 @@ public class FollowCam : MonoBehaviour
 	Vector3 xAxis, yAxis, zAxis;
 	bool following;
 	float collisionRange = 5f;
-	MLEngine world;
+	Controller_Set world;
 	bool hasLock = false;
 	GameObject cSelf;
  
@@ -35,7 +35,7 @@ public class FollowCam : MonoBehaviour
 	public void setTarget (GameObject _target)
 	{
 		settings = GameObject.Find ("Root").GetComponent <MLSettings> ();
-		world = GameObject.Find ("Root").GetComponent <MLEngine> ();
+		world = GameObject.Find ("Root").GetComponent <Controller_Set> ();
 		cSelf = transform.gameObject;
 
 		lineDebug = GameObject.Find ("MainVisualisationObject").GetComponent<VisualLineDebug> ();

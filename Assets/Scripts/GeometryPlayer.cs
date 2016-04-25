@@ -27,97 +27,7 @@ public class GeometryPlayer
 	}
 
 
-	// Use this for initialization
-	/*
-	void Start ()
-	{
-		meshPlaylist = new ArrayList ();
-		durations = new ArrayList ();
-		gameObjectReferences = new ArrayList ();
-		timer = 0f;
-		duration = 1f;
-		index = 0;
-		frames = 0;
 
-
-	}
-
-*/
-
-
-
-	/*
-	// Update is called once per frame
-	void Update () {
-		
-	
-		if (index < meshPlaylist.Count) {
-			timer += Time.deltaTime;
-
-			if (timer > duration) {
-				
-				while (timer > duration) { // skip frames
-					timer -= duration;
-
-
-					local = (ExtendedMesh)meshPlaylist [index];
-					duration = local.getDuration ();
-					index++;
-					if (index == meshPlaylist.Count) {
-						break;
-
-					}
-
-				}
-
-//				transform.gameObject.GetComponent <MeshFilter> ().mesh = local.getMesh ();
-//				GetComponent <CustomRender>().CreateLinesFromMesh ();
-				Debug.Log (index);
-			}
-		}
-			
-	}	
-
-
-	// Update is called once per frame
-	void Update () {
-
-
-		if (index < durations.Count) {
-			timer += Time.deltaTime;
-
-			if (timer > duration) {
-
-				while (timer > duration) { // skip frames
-					timer -= duration;
-
-					GameObject local = (GameObject) gameObjectReferences [index];
-					local.SetActive (false);
-
-//					local = (ExtendedMesh)meshPlaylist [index];
-					duration = (float) durations [index];
-					index++;
-					if (index == durations.Count) {
-						break;
-
-					}
-
-				}
-				GameObject theObject = (GameObject) gameObjectReferences [index];
-				theObject.SetActive (true);
-
-
-				//				transform.gameObject.GetComponent <MeshFilter> ().mesh = local.getMesh ();
-				//				GetComponent <CustomRender>().CreateLinesFromMesh ();
-				Debug.Log (index);
-			}
-		}
-
-	
-	}
-
-
-	*/
 
 	int frames;
 
@@ -183,7 +93,7 @@ public class GeometryPlayer
 		workingObject.GetComponent<Renderer> ().useLightProbes = false;
 		workingObject.GetComponent<Renderer> ().reflectionProbeUsage = ReflectionProbeUsage.Off;
 
-		workingObject.GetComponent<Renderer> ().shadowCastingMode = ShadowCastingMode.TwoSided;
+//		workingObject.GetComponent<Renderer> ().shadowCastingMode = ShadowCastingMode.TwoSided;
 		workingObject.GetComponent<Renderer> ().receiveShadows = true;
 
 

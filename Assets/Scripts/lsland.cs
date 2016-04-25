@@ -2,21 +2,29 @@
 using UnityEngine;
 using System.Linq;
 using System.Collections;
+using System.Threading;
+
+
 
 public class Island
 {
 	// Class to hold a complete island
 	// Including terraindata, delauney, flock, cameras
 
-	RandomTerrain iTerrain;
-	Delauney iDelauney;
+	public RandomTerrain iTerrain;
+	DelauneyAlgorithmLegacy iDelauney;
 	Material iMaterial01;
 	GameObject iSelf, iDelauneyObject, iTerrainObject, iFlock;
 	Color iLineColor;
 	Mesh workingMesh;
 	GameObject localVisualisationObject;
-	ArrayList cameras;
+//	ArrayList cameras;
 	MLSettings settings;
+	Controller_Set engine;
+
+
+
+
 
 	public Island (GameObject _parentObject, String _myName)
 	{
@@ -25,100 +33,70 @@ public class Island
 		// basic initialisation
 		initialiseIsland (_parentObject, _myName);
 		setDefaultMaterials ();
+		engine = GameObject.Find ("Root").GetComponent <Controller_Set> (); // get a reference to the engine
+
+//		EventListener listener = new EventListener(engine);
+
+//		engine.Changed += new ChangedEventHandler (EngineChanged);
+
+
 	}
+//
+//	void EngineChanged (object sender, EngineChangedEventArgs e){
+//		Debug.Log("This is heard by the island class when the event fires: " + e.thisHappened);
+//
+//
+//	}
+
+//	public void Detach() 
+//	{
+//		// Detach ourselves from the notification list on engine (and others). If we don't, instances of Island will be kept active even if we remove it and destroy the gameobject.
+//		engine.Changed -= new ChangedEventHandler(EngineChanged);
+//	}
+
 
 
 	// ***************************************************************************************************
 	// Camera methods
 	// ***************************************************************************************************
 
-	public void initialiseCameras ()
-	{
-		cameras = new ArrayList ();
+//	public void initialiseCameras ()
+//	{
+//		cameras = new ArrayList ();
+////		cameras.Add (addOrbitCamera ("Orbitcam"));
+////		cameras.Add (addTargetCamera ("TargetCam01", 0));
+////		cameras.Add (addStaticCamera ("StaticCam02"));
+////		cameras.Add (addStaticCamera ("StaticCam03"));
+//	}
+//
+//	public void addOrbitCamera ()
+//	{
+//		cameras.Add (addOrbitCamera ("Orbitcam"));
+//	
+//	}
+//
+//	public void addDefaultCameras ()
+//	{
+//		
 //		cameras.Add (addOrbitCamera ("Orbitcam"));
 //		cameras.Add (addTargetCamera ("TargetCam01", 0));
 //		cameras.Add (addStaticCamera ("StaticCam02"));
 //		cameras.Add (addStaticCamera ("StaticCam03"));
-	}
-
-	public void addOrbitCamera ()
-	{
-		cameras.Add (addOrbitCamera ("Orbitcam"));
-	
-	}
-
-	public void addDefaultCameras ()
-	{
-		
-		cameras.Add (addOrbitCamera ("Orbitcam"));
-		cameras.Add (addTargetCamera ("TargetCam01", 0));
-		cameras.Add (addStaticCamera ("StaticCam02"));
-		cameras.Add (addStaticCamera ("StaticCam03"));
-	}
+//	}
+//
+//
+//	public GameObject getCamera (int i)
+//	{
+//		return (GameObject)cameras [i];
+//
+//	}
+//
+//	public int getCameraCount ()
+//	{
+//		return cameras.Count;
+//	}
 
 
-	public GameObject getCamera (int i)
-	{
-		return (GameObject)cameras [i];
-
-	}
-
-	public int getCameraCount ()
-	{
-		return cameras.Count;
-	}
-
-	GameObject addOrbitCamera (String _name)
-	{
-		GameObject workingObject = new GameObject (_name + "_anchor");
-		workingObject.transform.parent = iSelf.transform;
-		workingObject.transform.position = new Vector3 (0.5f * settings.size, 0.0f * settings.size, 0.5f * settings.size);
-
-		GameObject newCamera = new GameObject (_name);
-		newCamera.transform.parent = workingObject.transform;
-
-		Vector3 cameraPosition = new Vector3 (1.5f * settings.size, 0.1f * settings.size, 1.5f * settings.size);
-
-		newCamera.transform.position = cameraPosition;
-		newCamera.transform.localRotation = Quaternion.LookRotation (workingObject.transform.position - newCamera.transform.position, Vector3.up);
-
-		workingObject.AddComponent <OrbitCam> ();
-
-
-		return newCamera;
-	}
-
-	GameObject addStaticCamera (String _name)
-	{
-		// drop a new camera at a random point
-		GameObject newCamera = new GameObject (_name);
-		newCamera.transform.parent = iSelf.transform;
-
-		Vector3 cameraPosition = new Vector3 (UnityEngine.Random.Range (0.0f, settings.size), 0.0f, UnityEngine.Random.Range (0.0f, settings.size));
-
-//		cameraPosition.y = getHeight (cameraPosition.x, cameraPosition.z) + 0.5f * settings.initialAmplitude;
-		cameraPosition.y = getHeight (cameraPosition.x, cameraPosition.z) + 0.1f * settings.initialAmplitude;
-
-		newCamera.transform.position = cameraPosition;
-		newCamera.transform.localRotation = Quaternion.LookRotation (new Vector3 (settings.size * .25f, 0f, settings.size * .25f) - newCamera.transform.position, Vector3.up);
-
-		return newCamera;
-	}
-
-	public GameObject addTargetCamera (String _name, int _targetBoid)
-	{
-		GameObject newCamera = new GameObject (_name);
-		newCamera.transform.parent = iSelf.transform;
-		GameObject theTarget = iFlock.GetComponent<Flock> ().getBoid (_targetBoid);
-
-		FollowCam cameraControl = newCamera.AddComponent <FollowCam> ();
-
-		cameraControl.setTarget (theTarget);
-
-		cameraControl.setTargetDebug (VisualisationObject.newNull (theTarget.transform.position, 0.25f, localVisualisationObject));
-
-		return newCamera;
-	}
 
 	// ***************************************************************************************************
 	// Rendering methods
@@ -160,12 +138,14 @@ public class Island
 
 	}
 
+	/*
 	public void spawnFlock ()
 	{
 		iFlock = new GameObject ("iFlock");
 		iFlock.transform.parent = iSelf.transform;
 		iFlock.AddComponent <Flock> ().createFlock ();
 	}
+*/
 
 	public void spawnTerrain (float _size, int _iterations, float _amp, float _roughness)
 	{
@@ -195,9 +175,12 @@ public class Island
 
 	}
 
+
+
+
 	public void spawnDelauney (int vertices, float size)
 	{
-		iDelauney = new Delauney ();
+		iDelauney = new DelauneyAlgorithmLegacy ();
 		iDelauney.createDelauney (vertices, size, iTerrain);
 		iDelauneyObject = new GameObject ("iDelauney");
 		iDelauneyObject.transform.parent = iSelf.transform;
@@ -224,6 +207,7 @@ public class Island
 		iDelauneyObject.SetActive (true);
 
 	}
+
 	/*
 	public void spawnDelauneyLegacy (int vertices, float size)
 	{
@@ -294,7 +278,7 @@ public class Island
 	public void spawnDelauney (int vertices, float size, GeometryPlayer targetGeometryPlayer)
 	{
 
-		iDelauney = new Delauney ();
+		iDelauney = new DelauneyAlgorithmLegacy ();
 		iDelauney.createDelauney (vertices, size, iTerrain, targetGeometryPlayer);
 		iDelauneyObject = new GameObject ("iDelauney");
 		iDelauneyObject.transform.parent = iSelf.transform;
@@ -385,7 +369,7 @@ public class Island
 		return (iSelf);
 	}
 
-	public Delauney getDelauney ()
+	public DelauneyAlgorithmLegacy getDelauney ()
 	{
 		return (iDelauney);
 	}
